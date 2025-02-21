@@ -44671,7 +44671,7 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
-const { OpenAI } = __nccwpck_require__(47); // Updated import
+const { OpenAI } = __nccwpck_require__(47);
 const { exec } = __nccwpck_require__(1514);
 
 async function run() {
@@ -44685,19 +44685,28 @@ async function run() {
     // Initialize clients
     const octokit = github.getOctokit(githubToken);
     const context = github.context;
-    const openai = new OpenAI({ apiKey: apiKey }); // Updated initialization
+    const openai = new OpenAI({ apiKey: apiKey });
 
     if (!context.payload.pull_request) {
       core.setFailed("This action must run in a pull_request context.");
       return;
     }
 
-    // ... rest of your code remains the same until the OpenAI API call ...
+    const owner = context.repo.owner;
+    const repo = context.repo.repo;
+    const prNumber = context.payload.pull_request.number;
 
     if (mode === "summarize_commits") {
-      // ... other code ...
+      // Fetch commits
+      core.info("Fetching commits...");
+      const { data: commits } = await octokit.rest.pulls.listCommits({
+        owner,
+        repo,
+        pull_number: prNumber,
+      });
 
-      // Updated ChatGPT call (using the new OpenAI client)
+      // Summarize each commit
+      core.info("Summarizing commits with ChatGPT...");
       const summaries = await Promise.all(
         commits.map(async (commit) => {
           const message = commit.commit.message.split("\n")[0]; // Use first line of commit message
@@ -44715,26 +44724,49 @@ async function run() {
         }),
       );
 
-      // ... rest of the code ...
-    } else if (mode === "generate_changelog") {
-      // ... other code ...
+      // Create or update PR comment
+      const commentBody = [
+        "### Commit Summaries",
+        "<!-- COMMIT_SUMMARIES_START -->",
+        summaries.join("\n"),
+        "<!-- COMMIT_SUMMARIES_END -->",
+        "",
+        "_Automatically updated by changelog-summarizer._",
+      ].join("\n");
 
-      // Updated ChatGPT call for overall summary
-      const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: `Generate a concise overall summary in bullet points for a changelog based on these commit summaries:\n\n${summaries}`,
-          },
-        ],
-        max_tokens: 100,
+      core.info("Updating PR comment...");
+      const { data: comments } = await octokit.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number: prNumber,
       });
-      const overallSummary = response.choices[0].message.content;
+      const existingComment = comments.find((c) =>
+        c.body.includes("<!-- COMMIT_SUMMARIES_START -->"),
+      );
 
-      // ... rest of the code ...
+      if (existingComment) {
+        await octokit.rest.issues.updateComment({
+          owner,
+          repo,
+          comment_id: existingComment.id,
+          body: commentBody,
+        });
+      } else {
+        await octokit.rest.issues.createComment({
+          owner,
+          repo,
+          issue_number: prNumber,
+          body: commentBody,
+        });
+      }
+      core.info("Commit summaries posted successfully.");
+    } else if (mode === "generate_changelog") {
+      // ... (leave this section unchanged for now)
+    } else {
+      core.setFailed(
+        `Invalid mode: ${mode}. Use "summarize_commits" or "generate_changelog".`,
+      );
     }
-    // ... rest of the code ...
   } catch (error) {
     core.setFailed(`Action failed: ${error.message}`);
   }
