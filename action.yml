@@ -1,0 +1,20 @@
+name: 'Changelog Summarizer'
+description: 'Summarize commit messages and generate a changelog using ChatGPT'
+inputs:
+  mode:
+    description: 'Mode of operation: summarize_commits or generate_changelog'
+    required: true
+  api-key:
+    description: 'OpenAI API key for ChatGPT'
+    required: true
+  github-token:
+    description: 'GitHub token for API access and commits'
+    required: true
+    default: ${{ github.token }}
+  changelog-file:
+    description: 'Path to the changelog file'
+    required: false
+    default: 'CHANGELOG.md'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
