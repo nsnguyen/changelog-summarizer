@@ -2,6 +2,9 @@ name: Summarize Commits
 on:
   pull_request:
     types: [opened, synchronize]
+permissions:
+  pull-requests: write # Needed to create/update PR comments
+  contents: read # Needed to access repository contents
 jobs:
   summarize:
     runs-on: ubuntu-latest
@@ -11,4 +14,4 @@ jobs:
         with:
           mode: summarize_commits
           api-key: ${{ secrets.CHATGPT_API_KEY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }} # Use default token with enhanced perms
