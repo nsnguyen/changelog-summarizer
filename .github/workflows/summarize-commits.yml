@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./
+      - uses: nsnguyen/changelog-summarizer@v1
         with:
           mode: summarize_commits
           api-key: ${{ secrets.CHATGPT_API_KEY }}
