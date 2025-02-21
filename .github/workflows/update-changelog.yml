@@ -2,6 +2,9 @@ name: Update Changelog
 on:
   pull_request:
     types: [closed]
+permissions:
+  pull-requests: read # May not be needed, but safe to include
+  contents: write # Needed to commit and push CHANGELOG.md
 jobs:
   update:
     if: github.event.pull_request.merged == true
@@ -14,5 +17,5 @@ jobs:
         with:
           mode: generate_changelog
           api-key: ${{ secrets.CHATGPT_API_KEY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
           changelog-file: CHANGELOG.md
