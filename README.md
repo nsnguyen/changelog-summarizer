@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: nsnguyen/changelog-summarizer@v1 # Replace 'nsnguyen' with the action owner's username
+      - uses: nsnguyen/changelog-summarizer@v1
         with:
           mode: summarize_commits
           api-key: ${{ secrets.CHATGPT_API_KEY }}
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.base.ref }}
-      - uses: nsnguyen/changelog-summarizer@v1 # Replace 'nsnguyen' with the action owner's username
+      - uses: nsnguyen/changelog-summarizer@v1
         with:
           mode: generate_changelog
           api-key: ${{ secrets.CHATGPT_API_KEY }}
@@ -84,15 +84,17 @@ jobs:
 
 ### 2. Set Up Secrets
 
-Go to your repository on GitHub > Settings > Secrets and variables > Actions > New repository secret.
-Add a secret named `CHATGPT_API_KEY` with your OpenAI API key value.
-Ensure the API key has sufficient quota for ChatGPT API calls.
+- Go to your repository on GitHub > Settings > Secrets and variables > Actions > New repository secret.
+
+- Add a secret named `CHATGPT_API_KEY` with your OpenAI API key value.
+
+- Ensure the API key has sufficient quota for ChatGPT API calls.
 
 ### 3. Customize (Optional)
 
-Change the Changelog File: Modify the `changelog-file` input in `update-changelog.yml` to use a different file path (e.g., `docs/CHANGELOG.md`).
+- Change the Changelog File: Modify the `changelog-file` input in `update-changelog.yml` to use a different file path (e.g., `docs/CHANGELOG.md`).
 
-Adjust Summary Format: If you want to customize how summaries are generated, fork this repository, modify `src/index.js` (e.g., change the ChatGPT prompt), rebuild with `npm run build`, and tag a new version (e.g., `v2`).
+- Adjust Summary Format: If you want to customize how summaries are generated, fork this repository, modify `src/index.js` (e.g., change the ChatGPT prompt), rebuild with `npm run build`, and tag a new version (e.g., `v2`).
 
 ## Updating the Action
 
