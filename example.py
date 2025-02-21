@@ -9,4 +9,4 @@ def add_numbers(a, b):
 
 if __name__ == "__main__":
     print(greet("Alice"))
-    print(add_numbers(5, 3))
+    print(add_numbers(5, 3))Update greeting function
